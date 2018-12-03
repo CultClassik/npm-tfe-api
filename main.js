@@ -3,7 +3,7 @@ const applies = require('./applies');
 const configs = require('./configuraion-versions');
 const runs = require('./runs');
 //const plans = require('./plans');
-const plans = {
+/*const plans = {
     test: function() {
       let request = this.req("GET", "plans");
       return request;
@@ -13,7 +13,7 @@ const plans = {
       let request = this.req("GET", "plans", id);
       return request;
     },
-}
+}*/
 
 /*
 Stratos should store configurations in MongoDB, as opposed to VCS.
@@ -22,13 +22,14 @@ If a run is called, configuration-versions must also be managed.
 */
 
 // Returns a client object to perform REST requests against a Terraform Enterprise instance.
-module.exports = function tfeClient(tfeHost, tfeToken) {
+module.exports = function tfeClient(tfeHost, tfeToken, workspaceId) {
   let client = {
-    conf: getConfig(tfeHost, tfeToken),
+    conf: getConfig(tfeHost, tfeToken, workspaceId),
     applies: applies,
     configs: configs,
-    plans: plans,
-    runs: runs,
+    testPlans: plansTest,
+    getPlanById: planGet,
+    listRunsByWorkspaceId: runsList,
     req: doRequest,
     test: this.plans,
   }
@@ -36,10 +37,11 @@ module.exports = function tfeClient(tfeHost, tfeToken) {
 }
 
 //const getConfig = function (tfeHost, tfeToken) {
-function getConfig(tfeHost, tfeToken) {
+function getConfig(tfeHost, tfeToken, workspaceId) {
     tfeConfig = {
         host: tfeHost,
         token: tfeToken,
+        workspaceId: workspaceId,
         baseUrl: "/api/v2/",
         url: function() {
             return this.host + this.baseUrl;
@@ -48,13 +50,13 @@ function getConfig(tfeHost, tfeToken) {
           plans: "plans",
           runs: "runs",
           applies: "applies",
+          workspaces: "workspaces",
         },
     }
 
     return tfeConfig;
 }
 
-// type == GET, POST, etc
 function doRequest(type, endPoint, urlAppend) {
     let finalUrl = 'https://' + this.conf.url() + this.conf.endPoints[endPoint];
     if (urlAppend) {
@@ -76,4 +78,23 @@ console.log("Final URL:: " + finalUrl);
         console.log(response.statusCode);
     });
 
+}
+
+//
+// For testing against public api uri only
+//
+function plansTest() {
+    let request = this.req("GET", "plans");
+    return request;
+}
+
+function planGet(id) {
+    let request = this.req("GET", "plans", id);
+    return request;
+}
+
+function runsList() {
+    let urlAppend = this.conf.workspaceId + "/runs";
+    let request = this.req("GET", "workspace", urlAppend);
+    return request;
 }
