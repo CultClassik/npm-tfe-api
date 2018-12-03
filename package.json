@@ -1,0 +1,19 @@
+{
+  "name": "tfe-api",
+  "version": "0.0.1",
+  "description": "Module to make calls to the Terraform Enterprise REST API",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CultClassik/npm-tfe-api.git"
+  },
+  "author": "Chris Diehl",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/CultClassik/npm-tfe-api/issues"
+  },
+  "homepage": "https://github.com/CultClassik/npm-tfe-api#readme"
+}
